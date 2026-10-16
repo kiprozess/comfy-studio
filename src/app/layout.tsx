@@ -10,13 +10,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Comfy Hackathon",
-  description: "Eine kreative App auf Basis der Comfy Developer Platform.",
+  title: "Comfy Studio",
+  description: "Try on outfits, extract flat lays and create mannequin poses with Comfy.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="de" className={inter.variable}>
+    <html lang="en" className={inter.variable}>
       {/* Browser extensions such as ColorZilla add attributes to <body> before hydration. */}
       <body suppressHydrationWarning>
         <StylingProvider>

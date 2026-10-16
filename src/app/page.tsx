@@ -6,7 +6,7 @@ export default function Home() {
     <main
       id="workspace"
       className={styles.workspace}
-      aria-label="Arbeitsbereich"
+      aria-label="Workspace"
       tabIndex={-1}
     >
       <PhotoUpload />
