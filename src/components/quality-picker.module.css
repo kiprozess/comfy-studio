@@ -1,0 +1,127 @@
+.picker {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  pointer-events: auto;
+}
+
+.legend {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 0 2px;
+  color: var(--app-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.hint {
+  color: var(--app-text-muted);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 3px;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  background: rgb(0 0 0 / 8%);
+}
+
+.option {
+  position: relative;
+  cursor: pointer;
+}
+
+.option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.option span {
+  display: grid;
+  min-height: 28px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: color 120ms, background 120ms;
+}
+
+.option:hover span {
+  color: var(--app-text);
+}
+
+.option input:checked + span {
+  border-color: var(--app-border);
+  background: var(--app-surface-hover);
+  color: var(--app-accent);
+}
+
+.option input:focus-visible + span {
+  outline: 2px solid var(--app-accent);
+  outline-offset: -2px;
+}
+
+.picker:disabled .option {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sizeRow {
+  position: relative;
+  display: flex;
+  pointer-events: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.sizeLabel {
+  color: var(--app-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.select {
+  min-width: 0;
+  width: 96px;
+  height: 30px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--app-input-border);
+  border-radius: 10px;
+  background: var(--app-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c2bfb9' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 12px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select option {
+  background: var(--app-dropdown);
+  color: var(--app-text);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 1px;
+}

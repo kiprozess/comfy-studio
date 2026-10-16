@@ -1,0 +1,104 @@
+.root {
+  position: relative;
+}
+
+/* Outline counterpart of the filled Download button, like Comfy's DESKTOP button. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--app-accent);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--app-accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.trigger:hover:not(:disabled),
+.trigger[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
+}
+
+.trigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  width: 220px;
+  padding: 6px;
+  border: 1px solid var(--app-input-border);
+  border-radius: 16px;
+  background: var(--app-dropdown);
+  box-shadow: 0 12px 40px #0008;
+}
+
+.option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--app-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.option:hover,
+.option:focus-visible {
+  background: var(--app-surface-hover);
+  outline: none;
+}
+
+.optionLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+}
+
+.optionHint {
+  color: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.note {
+  margin: 4px 12px 6px;
+  color: var(--app-text-muted);
+  font-size: 11px;
+}
+
+.done {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  color: var(--app-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}

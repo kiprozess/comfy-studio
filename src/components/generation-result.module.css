@@ -1,0 +1,4 @@
+.result { margin-top: 12px; }
+.error { padding: 14px; border: 1px solid var(--app-input-border); border-radius: 10px; color: var(--app-text-secondary); font-size: 12px; line-height: 1.6; }
+.error p { margin: 0; }
+.error button { margin-top: 10px; padding: 6px 0; border: 0; background: transparent; color: var(--app-accent); font-size: 11px; cursor: pointer; }

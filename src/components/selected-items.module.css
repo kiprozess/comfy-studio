@@ -1,0 +1,184 @@
+.card {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 20px;
+  margin-bottom: 10px;
+}
+
+.header h2 {
+  margin: 0;
+  color: var(--app-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.count {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thumbnail {
+  position: relative;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--color-primary-comfy-ink-light);
+  cursor: zoom-in;
+}
+
+.item {
+  position: relative;
+}
+
+.thumbnail:hover,
+.thumbnail:focus-visible {
+  border-color: var(--app-accent);
+}
+
+.thumbnail:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.remove {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--app-input-border);
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-primary-comfy-ink);
+  color: var(--app-text);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.item:hover .remove,
+.item:focus-within .remove {
+  opacity: 1;
+}
+
+.remove:focus-visible,
+.closeButton:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
+
+.dialog {
+  width: min(640px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--app-input-border);
+  border-radius: 16px;
+  background: var(--app-bg);
+  color: var(--app-text);
+  box-shadow: 0 24px 100px #0008;
+}
+
+.dialog::backdrop {
+  background: #000a;
+  backdrop-filter: blur(6px);
+}
+
+.dialogContent {
+  padding: 20px;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.categoryLabel {
+  margin: 0 0 4px;
+  color: var(--app-accent);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.dialogHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.closeButton {
+  display: grid;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.largePreview {
+  position: relative;
+  width: min(100%, calc((100dvh - 180px) * .75));
+  aspect-ratio: 3 / 4;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--app-surface);
+}
+
+@media (hover: none) {
+  .remove {
+    opacity: 1;
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: 9px 0;
+  color: var(--app-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}

@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "../../design/comfy-colors.css";
+
+@theme inline {
+  --color-background: var(--app-bg);
+  --color-foreground: var(--app-text);
+  --color-accent: var(--app-accent);
+  --color-surface: var(--app-surface);
+  --font-sans: var(--app-font);
+}
+
+:root {
+  --app-font: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: var(--app-font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,370 @@
+/* Space below the frame for the toolbar row and the Selected items card. */
+.container {
+  --below-frame: 164px;
+
+  width: min(100%, 520px);
+}
+
+.photoColumn {
+  min-width: 0;
+}
+
+/* Desktop: the frame always fits the screen height, so uploading never makes the page scroll. */
+@media (min-width: 601px) {
+  .container {
+    width: min(100cqw, calc((100cqh - var(--below-frame)) * var(--frame-ratio, 0.75)));
+    max-height: 100cqh;
+  }
+
+  .photoColumn {
+    display: flex;
+    flex-direction: column;
+    max-height: 100cqh;
+  }
+
+  .uploadCard {
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+}
+
+.uploadCard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--frame-ratio, 0.75);
+  overflow: hidden;
+  border: 1px dashed var(--app-input-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.uploadCard[data-filled="true"] {
+  border-style: solid;
+  border-color: var(--app-border);
+}
+
+.uploadCard[data-dragging="true"] {
+  border-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-accent) 5%, var(--app-bg));
+}
+
+.dropZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 48px 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dropZone:hover {
+  background: var(--app-surface);
+}
+
+.uploadIcon {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 24px;
+  place-items: center;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+}
+
+.dropTitle {
+  color: var(--app-text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.dropHint {
+  margin-top: 6px;
+  color: var(--app-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chooseButton {
+  margin-top: 24px;
+  padding: 10px 24px;
+  border: 1px solid var(--app-accent);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--app-accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.dropZone:hover .chooseButton {
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+}
+
+.photo {
+  object-fit: contain;
+}
+
+.beforeLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--app-accent);
+  pointer-events: none;
+}
+
+.divider span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--app-accent);
+  border-radius: 50%;
+  background: var(--app-bg);
+  transform: translate(-50%, -50%);
+}
+
+.uploadCard:has(.compareSlider:focus-visible) .divider span {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent) 40%, transparent);
+}
+
+.compareLabel {
+  position: absolute;
+  bottom: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--color-transparency-ink-t80);
+  color: var(--app-text);
+  font-size: 11px;
+  pointer-events: none;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.beforeLabel {
+  left: 12px;
+}
+
+.afterLabel {
+  right: 12px;
+}
+
+.compareSlider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: color-mix(in srgb, var(--app-bg) 55%, transparent);
+  backdrop-filter: blur(2px);
+  color: var(--app-text);
+  font-size: 14px;
+  text-align: center;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--app-input-border);
+  border-top-color: var(--app-accent);
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  padding: 20px;
+  place-items: center;
+  background: var(--color-transparency-ink-t80);
+  color: var(--app-accent);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.replacePhoto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.photoToolbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 32px;
+  margin-top: 12px;
+}
+
+.toolbarActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.photoInfo {
+  position: relative;
+}
+
+.infoButton,
+.toolButton {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+  cursor: help;
+}
+
+.toolButton {
+  cursor: pointer;
+}
+
+.toolButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolButton[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--app-accent) 60%, transparent);
+  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
+  color: var(--app-accent);
+}
+
+.infoButton:hover,
+.infoButton:focus-visible,
+.toolButton:hover:not(:disabled),
+.toolButton:focus-visible {
+  color: var(--app-accent);
+  border-color: var(--app-input-border);
+}
+
+.infoTooltip {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 2;
+  width: min(300px, calc(100vw - 64px));
+  padding-top: 8px;
+  color: var(--app-text);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.infoTooltip dl {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--app-input-border);
+  border-radius: 10px;
+  background: var(--app-bg);
+  box-shadow: 0 8px 32px #0005;
+}
+
+.infoTooltip dt {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.infoTooltip dd {
+  margin: 4px 0 12px;
+}
+
+.infoTooltip dd:last-child {
+  margin-bottom: 0;
+}
+
+.formats {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  left: 16px;
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.requestId {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.error {
+  margin: 12px 0 0;
+  color: var(--color-destructive-light);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.container button:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: -4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uploadCard {
+    transition: none;
+  }
+
+  .spinner {
+    animation-duration: 3s;
+  }
+}
+

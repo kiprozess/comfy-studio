@@ -1,0 +1,27 @@
+.workspace {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100dvh;
+  padding: 40px;
+  outline: none;
+  container-type: size;
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .workspace {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .workspace {
+    order: -1;
+    height: auto;
+    min-height: auto;
+    container-type: normal;
+    padding: 32px 52px 40px 20px;
+  }
+}

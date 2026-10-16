@@ -1,0 +1,45 @@
+/*
+ * Extracted from live CSS variables and computed styles on 2026-10-16.
+ * Source: https://comfy.org/hub/apps/cinematic-studio/
+ * Observed website palette; not a separate official design-system release.
+ */
+:root {
+  /* Original Comfy CSS token names and values. */
+  --color-primary-comfy-ink: #211927;
+  --color-primary-comfy-ink-light: #2a2330;
+  --color-primary-comfy-yellow: #f2ff59;
+  --color-primary-comfy-canvas: #c2bfb9;
+  --color-primary-warm-white: #f0efed;
+  --color-primary-warm-gray: #7e7c78;
+  --color-primary-comfy-plum: #49378b;
+  --color-primary-comfy-orange: #fabc25;
+  --color-primary-comfy-red: #ff3b3b;
+  --color-secondary-deep-plum: #2b2040;
+  --color-secondary-mauve: #4d3762;
+  --color-secondary-charcoal: #242428;
+  --color-secondary-cool-gray: #3c3c3c;
+  --color-site-dropdown: #332b38;
+  --color-workflow-selection: #a894ef;
+  --color-hub-muted: #8a8a8a;
+  --color-brand-yellow: #f0ff41;
+  --color-destructive: #f44336;
+  --color-destructive-light: #ffb4a8;
+  --color-transparency-white-t4: #ffffff0a;
+  --color-transparency-white-t8: #ffffff14;
+  --color-transparency-white-t20: #ffffff33;
+  --color-transparency-white-t40: #ffffff66;
+  --color-transparency-ink-t80: #211927cc;
+
+  /* App aliases based on the roles observed in Cinematic Studio. */
+  --app-bg: var(--color-primary-comfy-ink);
+  --app-surface: var(--color-transparency-white-t4);
+  --app-surface-hover: var(--color-transparency-white-t8);
+  --app-dropdown: var(--color-site-dropdown);
+  --app-border: var(--color-transparency-white-t8);
+  --app-input-border: var(--color-transparency-white-t20);
+  --app-text: var(--color-primary-warm-white);
+  --app-text-secondary: var(--color-primary-comfy-canvas);
+  --app-text-muted: var(--color-primary-warm-gray);
+  --app-accent: var(--color-primary-comfy-yellow);
+  --app-on-accent: var(--color-primary-comfy-ink);
+}
