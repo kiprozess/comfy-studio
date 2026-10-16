@@ -16,12 +16,6 @@ const outfitNames = {
   male: ["Neutral streetwear", "Navy casual", "Tan tailoring", "Black minimal", "Cream knitwear", "Everyday denim", "Olive utility", "Monochrome formal"],
   female: ["Brown knit & denim", "Cream jacket & skirt", "Little black dress", "Gray tailoring", "Pastel weekend", "Summer whites", "Navy & pleats", "Red knit & trousers"],
 };
-const backgrounds: Choice[] = [
-  { id: "white-studio", label: "White studio", color: "#f5f4f1" },
-  { id: "warm-gray", label: "Warm gray", color: "#a6a19a" },
-  { id: "sand", label: "Sand", color: "#d4bfa7" },
-  { id: "dark-studio", label: "Dark studio", color: "#302a36" },
-];
 const poses: Choice[] = POSES.map((pose, index) => ({ id: pose.id, label: pose.label, pose: index, imageUrl: pose.image }));
 
 export function Sidebar() {
@@ -101,7 +95,7 @@ export function Sidebar() {
             const selected = selections[key];
             const presetChoices: Choice[] = category.id === "outfit"
               ? outfitNames[gender].map((label, index) => ({ id: `${gender}-outfit-${index}`, label, atlasIndex: index + (gender === "female" ? 8 : 0) }))
-              : category.id === "background" ? backgrounds : category.id === "pose" ? poses : [];
+              : category.id === "pose" ? poses : [];
             const visiblePresets = category.id === "outfit" && !showMore ? presetChoices.slice(0, 5) : presetChoices;
             const choices = [...(uploads[key] ?? []), ...visiblePresets];
 

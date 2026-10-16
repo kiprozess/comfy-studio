@@ -13,7 +13,7 @@ Upload a full-body photo and dress the person in something new:
 
 - **Outfits:** 16 built-in outfit presets (male and female collections) or your own reference images.
 - **Single garments:** outerwear, tops, sets, bottoms, socks, shoes and accessories, from your own uploads.
-- **Background:** plain studio colors.
+- **Background:** your own background reference images.
 - **Pose:** a mannequin pose reference. The model copies only the body position, never the mannequin's look.
 
 The result keeps the person's identity and the photo's framing. A before/after slider compares it with the original.
