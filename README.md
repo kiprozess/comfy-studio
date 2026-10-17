@@ -4,7 +4,7 @@ A fashion styling studio built on [Comfy Router](https://docs.comfy.org/developm
 
 Built with Next.js (App Router), React, TypeScript and Sharp. An independent hackathon project using the Comfy Developer Platform; not an official Comfy product.
 
-**[Visual walkthrough](#comfy-studio--visual-walkthrough)** · **[MIT license](LICENSE)** · **[Deployment and security notes](SECURITY.md)**
+**[Watch the demo on YouTube](https://www.youtube.com/watch?v=3etvhP7Dc64)** · **[Visual walkthrough](#comfy-studio--visual-walkthrough)** · **[MIT license](LICENSE)** · **[Deployment and security notes](SECURITY.md)**
 
 ## Comfy Studio — visual walkthrough
 
