@@ -12,7 +12,7 @@ Comfy Studio connects three workflows: try on clothes, extract product flat lays
 
 ### 1. Start the app
 
-Follow the [setup instructions](#getting-started), add your own Comfy key to `.env.local`, and open the local URL. Pick **Try-on** in the sidebar and upload a person photo. JPG, PNG, WebP and AVIF are accepted, up to 10 MB each.
+Follow the [setup instructions](#getting-started), add your own Comfy key to `.env.local`, and open the local URL. Pick **Try-on** in the sidebar. An AI-generated example model is already selected, so you can start by choosing your clothing reference. Click the photo to replace it with your own. JPG, PNG, WebP and AVIF are accepted, up to 10 MB each.
 
 ### 2. Select clothing
 
@@ -61,7 +61,7 @@ The application sends images to Comfy and the selected model provider to generat
 The switch at the top of the sidebar selects one of three workflows. Each keeps its own photo, quality and output size.
 
 ### Try-on
-Upload a full-body photo and dress the person in something new:
+Use the preselected AI-generated example model or upload your own full-body photo, then dress the person in something new:
 
 - **Outfits:** upload your own outfit reference images (male and female collections).
 - **Single garments:** outerwear, tops, sets, bottoms, socks, shoes and accessories, from your own uploads.
@@ -205,7 +205,7 @@ A real model run needs a valid key with credits.
 | `src/components` | UI: sidebar, photo stage, panels, history, buttons |
 | `src/lib` | Shared types and settings: categories, poses, flat lay items, quality, sizes, IndexedDB storage |
 | `src/lib/server` | Request validation, prompts, Comfy Router and Comfy Cloud clients |
-| `public/images` | Comfy logo and pose mannequins |
+| `public/images` | Comfy logo, example model and pose mannequins |
 | `design` | Color tokens taken from comfy.org and the license of the category icons |
 | `tests` | Node test runner suites |
 

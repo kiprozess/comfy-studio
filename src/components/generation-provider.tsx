@@ -10,6 +10,7 @@ import { flatlayCategory, type FlatlaySelection } from "@/lib/flatlay";
 import { DEFAULT_QUALITY, type Quality } from "@/lib/quality";
 import { DEFAULT_OUTPUT_SIZE, type OutputSize } from "@/lib/output-size";
 import { useStyling } from "./styling-provider";
+import { EXAMPLE_MODEL } from "@/lib/example-model";
 
 export type UpscaleResolution = "2k" | "4k" | "8k";
 /** "tryon" dresses a person in new clothes; "flatlay" extracts clothes from a photo into a flat lay. */
@@ -58,6 +59,7 @@ type GenerationState = {
   clearHistory: () => void;
   restoreEntry: (id: string) => void;
   personFile: File | null;
+  isExampleModel: boolean;
   setPersonFile: (file: File | null) => void;
   generate: () => Promise<void>;
   upscale: (resolution: UpscaleResolution) => Promise<void>;
@@ -106,8 +108,13 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<Mode>("tryon");
   // Each mode keeps its own photo: a person to dress, or a person whose outfit becomes a flat lay.
   const [photos, setPhotos] = useState<Record<Mode, File | null>>({ tryon: null, flatlay: null, pose: null });
+  const [exampleFile, setExampleFile] = useState<File | null>(null);
+  const tryonPhotoChosen = useRef(false);
   const personFile = photos[mode];
-  const setPersonFile = useCallback((file: File | null) => setPhotos((current) => ({ ...current, [mode]: file })), [mode]);
+  const setPersonFile = useCallback((file: File | null) => {
+    if (mode === "tryon") tryonPhotoChosen.current = true;
+    setPhotos((current) => ({ ...current, [mode]: file }));
+  }, [mode]);
   const [flatlaySelection, setFlatlaySelection] = useState<FlatlaySelection>("complete");
   // Each mode keeps its own tier, e.g. cheap flat lay drafts next to high-quality try-ons.
   const [qualities, setQualities] = useState<Record<Mode, Quality>>({ tryon: DEFAULT_QUALITY, flatlay: DEFAULT_QUALITY, pose: DEFAULT_QUALITY });
@@ -140,6 +147,24 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   const hasClothing = stylingCategories.some((category) => !category.optional && selections[`${gender}:${category.id}`]);
   const hasParts = flatlaySelection === "complete" || flatlaySelection.length > 0;
   const ready = mode === "flatlay" ? hasParts : mode === "pose" ? true : hasClothing;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadExample() {
+      try {
+        const response = await fetch(EXAMPLE_MODEL.image, { signal: controller.signal });
+        if (!response.ok) return;
+        const blob = await response.blob();
+        if (controller.signal.aborted) return;
+        const file = new File([blob], EXAMPLE_MODEL.filename, { type: "image/png" });
+        setExampleFile(file);
+        // A user upload or history restore made during loading always wins.
+        setPhotos((current) => current.tryon || tryonPhotoChosen.current ? current : { ...current, tryon: file });
+      } catch { /* The ordinary photo uploader remains available if the example fails to load. */ }
+    }
+    void loadExample();
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     mounted.current = true;
@@ -431,6 +456,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
   function restoreEntry(id: string) {
     const entry = history.find((item) => item.id === id);
     if (busy || !entry?.image) return;
+    tryonPhotoChosen.current = true;
     const file = entry.personFile instanceof File ? entry.personFile
       : entry.personFile ? new File([entry.personFile], "photo.jpg", { type: entry.personFile.type || "image/jpeg" }) : null;
     attempt.current = null;
@@ -494,7 +520,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
     : !personFile ? "Upload a photo to get started"
     : !hasClothing ? "Choose an outfit or clothing reference" : "Ready to generate";
 
-  return <GenerationContext.Provider value={{ mode, setMode, quality, setQuality, outputSize, setOutputSize, flatlaySelection, setFlatlaySelection, resultTarget, resultSaved: Boolean(savedResult), saveResult, applyResult, history, trackEntry, clearHistory, restoreEntry, personFile, setPersonFile: choosePersonFile, generate, upscale, canUpscale: configured === true && !busy && Boolean(resultImage) && !resultEntry?.upscale, upscaler, resultUpscale: resultEntry?.upscale ?? null, resume, phase, busy, canGenerate: configured === true && Boolean(personFile) && ready && !busy && phase !== "paused", statusText, error, resultImage, resultRequestId: resultImage && resultToken ? tokenRequestId(resultToken) ?? null : null }}>{children}</GenerationContext.Provider>;
+  return <GenerationContext.Provider value={{ mode, setMode, quality, setQuality, outputSize, setOutputSize, flatlaySelection, setFlatlaySelection, resultTarget, resultSaved: Boolean(savedResult), saveResult, applyResult, history, trackEntry, clearHistory, restoreEntry, personFile, isExampleModel: personFile !== null && personFile === exampleFile, setPersonFile: choosePersonFile, generate, upscale, canUpscale: configured === true && !busy && Boolean(resultImage) && !resultEntry?.upscale, upscaler, resultUpscale: resultEntry?.upscale ?? null, resume, phase, busy, canGenerate: configured === true && Boolean(personFile) && ready && !busy && phase !== "paused", statusText, error, resultImage, resultRequestId: resultImage && resultToken ? tokenRequestId(resultToken) ?? null : null }}>{children}</GenerationContext.Provider>;
 }
 
 export function useGeneration() {

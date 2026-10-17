@@ -13,7 +13,7 @@ import styles from "./photo-upload.module.css";
 
 const acceptedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 export function PhotoUpload() {
-  const { personFile, setPersonFile, busy, resultImage, resultRequestId, resultUpscale, statusText, mode } = useGeneration();
+  const { personFile, isExampleModel, setPersonFile, busy, resultImage, resultRequestId, resultUpscale, statusText, mode } = useGeneration();
   const [photo, setPhoto] = useState<{
     file: File;
     url: string;
@@ -136,7 +136,7 @@ export function PhotoUpload() {
                   <Image
                     key={photo.url}
                     src={photo.url}
-                    alt={comparing ? "Before: your uploaded photo" : "Your uploaded styling photo"}
+                    alt={isExampleModel ? "AI-generated example model" : comparing ? "Before: your uploaded photo" : "Your uploaded styling photo"}
                     fill
                     unoptimized
                     sizes="(max-width: 600px) 90vw, 520px"
@@ -212,7 +212,7 @@ export function PhotoUpload() {
           )}
         </section>
         <div className={styles.photoToolbar}>
-          {resultImage && resultRequestId ? <RequestId id={resultRequestId} className={styles.requestId} /> : <span />}
+          {resultImage && resultRequestId ? <RequestId id={resultRequestId} className={styles.requestId} /> : isExampleModel ? <span className={styles.exampleLabel}>AI-generated example · click image to replace</span> : <span />}
           <div className={styles.toolbarActions}>
           {resultImage ? (
             <>

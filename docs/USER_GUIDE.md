@@ -4,7 +4,7 @@ Comfy Studio connects three workflows: try on clothes, extract product flat lays
 
 ## 1. Start the app
 
-Follow the [setup instructions](../README.md#getting-started), add your own Comfy key to `.env.local`, and open the local URL. Pick **Try-on** in the sidebar and upload a person photo. JPG, PNG, WebP and AVIF are accepted, up to 10 MB each.
+Follow the [setup instructions](../README.md#getting-started), add your own Comfy key to `.env.local`, and open the local URL. Pick **Try-on** in the sidebar. An AI-generated example model is already selected, so you can start by choosing your clothing reference. Click the photo to replace it with your own. JPG, PNG, WebP and AVIF are accepted, up to 10 MB each.
 
 ## 2. Select clothing
 
