@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local recordings, screenshots, voiceovers and generated working material
+/artifacts/
+/.data/

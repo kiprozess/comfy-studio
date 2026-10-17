@@ -37,3 +37,18 @@ test("flat lays keep a 2:3 portrait at every output size", async () => {
   assert.equal(resolveFlatlaySize("2k"), "1360x2048");
   assert.equal(resolveFlatlaySize("4k"), "2336x3520");
 });
+
+
+test("a selected pose sets the output aspect ratio instead of the identity photo", async () => {
+  const form = new FormData();
+  for (const [field, width, height] of [["photo", 300, 400], ["reference-pose", 400, 300]] as const) {
+    const bytes = await sharp({ create: { width, height, channels: 3, background: "white" } }).png().toBuffer();
+    form.set(field, new File([new Uint8Array(bytes)], "image.png", { type: "image/png" }));
+  }
+  form.set("selections", JSON.stringify([{ category: "outfit", presetIndex: 0 }, { category: "pose" }]));
+  form.set("size", "2k");
+  const result = await buildGenerationInput(form);
+  assert.equal(result.size, "2048x1536");
+  assert.match(result.prompt, /Use the pose reference's aspect ratio/);
+  assert.doesNotMatch(result.prompt, /Keep the original image aspect ratio/);
+});
