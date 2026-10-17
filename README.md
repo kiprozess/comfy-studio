@@ -54,7 +54,7 @@ The slider compares two images in the same display area. When the pose changes c
 
 ### Where your images go
 
-The application sends images to Comfy and the selected model provider to generate results. History and saved library tiles stay in this browser's IndexedDB. Clearing browser storage removes them. 
+The application sends images to Comfy and the selected model provider to generate results. History and saved library tiles stay in this browser's IndexedDB. Clearing browser storage removes them.
 
 ## What it does
 
