@@ -11,13 +11,14 @@ import type { StylingChoice as Choice } from "@/lib/styling-types";
 import styles from "./sidebar.module.css";
 import { stylingCategories as categories, type CategoryId } from "@/lib/styling-categories";
 import { POSES } from "@/lib/poses";
+import { DEMO_OUTFITS } from "@/lib/demo-outfits";
 
 const poses: Choice[] = POSES.map((pose, index) => ({ id: pose.id, label: pose.label, pose: index, imageUrl: pose.image }));
 
 export function Sidebar() {
   const { generate, resume, phase, busy, canGenerate, statusText, mode, setMode } = useGeneration();
   const { gender, setGender, selections, uploads, toggleChoice, addReference, resetStyling, removeFromLibrary } = useStyling();
-  const [openCategory, setOpenCategory] = useState<CategoryId | null>(null);
+  const [openCategory, setOpenCategory] = useState<CategoryId | null>("outfit");
   const [error, setError] = useState<string | null>(null);
   function reset() {
     resetStyling();
@@ -87,7 +88,10 @@ export function Sidebar() {
             const expanded = openCategory === category.id;
             const key = `${gender}:${category.id}`;
             const selected = selections[key];
-            const choices = [...(uploads[key] ?? []), ...(category.id === "pose" ? poses : [])];
+            const builtIn: Choice[] = category.id === "outfit"
+              ? DEMO_OUTFITS.filter((outfit) => outfit.gender === gender).map((outfit) => ({ id: `demo-${outfit.id}`, label: outfit.label, demoOutfit: outfit.id }))
+              : category.id === "pose" ? poses : [];
+            const choices = [...(uploads[key] ?? []), ...builtIn];
 
             return (
               <section className={`${styles.category} ${category.optional ? styles.optionalCategory : ""}`} data-open={expanded} key={category.id}>

@@ -16,9 +16,9 @@ Follow the [setup instructions](#getting-started), add your own Comfy key to `.e
 
 ### 2. Select clothing
 
-Choose Male or Female to organize your references, then expand **Outfit** and use the **+** tile to upload an outfit image you have permission to use. You can also upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
+The **Outfit** panel opens with eight demo outfits for the selected Male or Female collection (16 total). Select a tile to try it on the example model, or use the **+** tile to upload an outfit image you have permission to use. You can also upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
 
-![Upload your own outfit reference](docs/images/outfit-selection.jpg)
+![Demo outfits and custom outfit uploads](docs/images/outfit-selection.jpg)
 
 Choose output size and quality, then click **Generate**. Each submission uses your Comfy workspace credits. Do not start another job just because the first one is still queued; its status appears in the workspace and history.
 
@@ -63,7 +63,7 @@ The switch at the top of the sidebar selects one of three workflows. Each keeps 
 ### Try-on
 Use the preselected AI-generated example model or upload your own full-body photo, then dress the person in something new:
 
-- **Outfits:** upload your own outfit reference images (male and female collections).
+- **Outfits:** 16 author-supplied demo outfits across male and female collections, plus your own reference images.
 - **Single garments:** outerwear, tops, sets, bottoms, socks, shoes and accessories, from your own uploads.
 - **Background:** your own background reference images.
 - **Pose:** a mannequin pose reference. The reference supplies the target posture, camera view, crop and aspect ratio; the person photo supplies identity and the clothing references supply the outfit.
@@ -148,7 +148,7 @@ Each workflow builds its own prompt and numbers its reference images explicitly:
 
 | Workflow | Prompt | Notes |
 |---|---|---|
-| Try-on | `src/lib/server/generation-input.ts` | User-uploaded outfit and garment references are normalized on the server |
+| Try-on | `src/lib/server/generation-input.ts` | The chosen demo outfit is cropped from the lookbook; custom garment references are normalized on the server |
 | Flatlay | `src/lib/server/flatlay-input.ts` | Item list in `src/lib/flatlay.ts` |
 | Pose | `src/lib/server/pose-input.ts` | The first library mannequin is sent as the style reference |
 
@@ -205,7 +205,7 @@ A real model run needs a valid key with credits.
 | `src/components` | UI: sidebar, photo stage, panels, history, buttons |
 | `src/lib` | Shared types and settings: categories, poses, flat lay items, quality, sizes, IndexedDB storage |
 | `src/lib/server` | Request validation, prompts, Comfy Router and Comfy Cloud clients |
-| `public/images` | Comfy logo, example model and pose mannequins |
+| `public/images` | Comfy logo, example model, demo outfit lookbook and pose mannequins |
 | `design` | Color tokens taken from comfy.org and the license of the category icons |
 | `tests` | Node test runner suites |
 

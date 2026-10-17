@@ -1,7 +1,9 @@
 import type { CategoryId } from "./styling-categories";
+import type { DemoOutfitId } from "./demo-outfits";
 
 export type GenerationSelection = {
   category: CategoryId;
+  demoOutfit?: DemoOutfitId;
   color?: string;
   pose?: number;
 };

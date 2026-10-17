@@ -5,6 +5,7 @@ import { POSES } from "../poses";
 import { DEFAULT_QUALITY, isQuality, type Quality } from "../quality";
 import { DEFAULT_OUTPUT_SIZE, isOutputSize, resolveOutputSize, type OutputSize } from "../output-size";
 import type { GenerationSelection } from "../generation-types";
+import { DEMO_OUTFIT_IMAGE, DEMO_OUTFIT_COLUMNS, DEMO_OUTFIT_ROWS, getDemoOutfit, type DemoOutfitId } from "../demo-outfits";
 
 export class GenerationError extends Error {
   constructor(message: string, public status = 400) { super(message); }
@@ -57,9 +58,12 @@ export function parseSelections(value: FormDataEntryValue | null): GenerationSel
     }
     seen.add(choice.category);
     if ("presetIndex" in item && item.presetIndex !== undefined) {
-      throw new GenerationError("Built-in outfit presets are no longer available. Upload your own outfit reference.");
+      throw new GenerationError("These legacy outfit presets are no longer available. Choose a demo outfit or upload your own reference.");
     }
-    const sources = [choice.color !== undefined, choice.pose !== undefined].filter(Boolean).length;
+    if (choice.demoOutfit !== undefined && (choice.category !== "outfit" || !getDemoOutfit(choice.demoOutfit))) {
+      throw new GenerationError("Unknown demo outfit.");
+    }
+    const sources = [choice.demoOutfit !== undefined, choice.color !== undefined, choice.pose !== undefined].filter(Boolean).length;
     if (sources > 1) throw new GenerationError("A styling item can only have one reference.");
     if (choice.color !== undefined && (choice.category !== "background" || !/^#[0-9a-f]{6}$/i.test(choice.color))) {
       throw new GenerationError("Invalid background color.");
@@ -67,7 +71,7 @@ export function parseSelections(value: FormDataEntryValue | null): GenerationSel
     if (choice.pose !== undefined && (choice.category !== "pose" || !Number.isInteger(choice.pose) || choice.pose < 0 || choice.pose >= POSES.length)) {
       throw new GenerationError("Unknown pose.");
     }
-    return { category: choice.category, color: choice.color, pose: choice.pose };
+    return { category: choice.category, demoOutfit: choice.demoOutfit, color: choice.color, pose: choice.pose };
   });
 }
 
@@ -87,6 +91,19 @@ export async function imageData(file: FormDataEntryValue | null) {
 // Pose references are mannequin photos from public/images/poses, sent like any other reference image.
 async function poseImage(index: number) {
   return sharp(path.join(process.cwd(), "public", POSES[index].image)).flatten({ background: "#ffffff" }).jpeg({ quality: 95 }).toBuffer();
+}
+
+async function demoOutfitImage(id: DemoOutfitId) {
+  const outfit = getDemoOutfit(id)!; // Validated by parseSelections before reading a file.
+  const image = sharp(path.join(process.cwd(), "public", DEMO_OUTFIT_IMAGE));
+  const metadata = await image.metadata();
+  const column = outfit.tile % DEMO_OUTFIT_COLUMNS;
+  const row = Math.floor(outfit.tile / DEMO_OUTFIT_COLUMNS);
+  const left = Math.round(column * metadata.width! / DEMO_OUTFIT_COLUMNS);
+  const top = Math.round(row * metadata.height! / DEMO_OUTFIT_ROWS);
+  const right = Math.round((column + 1) * metadata.width! / DEMO_OUTFIT_COLUMNS);
+  const bottom = Math.round((row + 1) * metadata.height! / DEMO_OUTFIT_ROWS);
+  return image.extract({ left, top, width: right - left, height: bottom - top }).jpeg({ quality: 95 }).toBuffer();
 }
 
 // A missing field keeps the default, so older clients still work; anything else must be a known tier.
@@ -143,7 +160,8 @@ export async function buildGenerationInput(form: FormData) {
       continue;
     }
     const file = form.get(`reference-${choice.category}`);
-    images.push(await imageData(file));
+    if (choice.demoOutfit && file) throw new GenerationError("Choose either a demo outfit or an uploaded outfit reference.");
+    images.push(choice.demoOutfit ? await demoOutfitImage(choice.demoOutfit) : await imageData(file));
     instructions.push(`Image ${images.length} is the ${label.toLowerCase()} reference. ${choice.category === "outfit" ? "Transfer its complete outfit onto the person; the reference may be a flat-lay collage. Output the person wearing it, never the collage." : `Transfer only the selected ${label.toLowerCase()} from this reference.`} Match garment colors, patterns, materials and design as closely as possible. Use this image for clothing only, not for the person's identity, pose or background.`);
   }
   if (!selections.some(({ category }) => category === "background")) {

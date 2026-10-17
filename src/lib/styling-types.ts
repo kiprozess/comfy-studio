@@ -1,8 +1,11 @@
+import type { DemoOutfitId } from "./demo-outfits";
+
 export type Gender = "male" | "female";
 
 export type StylingChoice = {
   id: string;
   label: string;
+  demoOutfit?: DemoOutfitId;
   imageUrl?: string;
   file?: File;
   color?: string;
