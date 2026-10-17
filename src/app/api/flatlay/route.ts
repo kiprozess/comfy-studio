@@ -1,3 +1,4 @@
+import { consumeSubmissionBudget } from "@/lib/server/request-access";
 import { GenerationError, readGenerationForm } from "@/lib/server/generation-input";
 import { buildFlatlayInput } from "@/lib/server/flatlay-input";
 import { getComfyKey, submitGeneration } from "@/lib/server/comfy-router";
@@ -8,6 +9,8 @@ const headers = { "Cache-Control": "no-store" };
 
 // Same model and queue as /api/generate, so status and result come from /api/generate/[token].
 export async function POST(request: Request) {
+  const blocked = await consumeSubmissionBudget();
+  if (blocked) return blocked;
   try {
     const origin = request.headers.get("origin");
     if ((origin && origin !== new URL(request.url).origin) || request.headers.get("sec-fetch-site") === "cross-site") {

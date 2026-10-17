@@ -49,11 +49,10 @@ test("builds an edit with the original first, only the selected atlas tile, and 
   const mannequin = await sharp("public/images/poses/mannequin-standing.webp").metadata();
   assert.equal(pose.width, mannequin.width);
   assert.match(result.prompt, /Image 3 is the pose reference: a faceless mannequin standing upright/);
-  assert.match(result.prompt, /never copy its face, hair, skin, color, material, clothing or body shape/);
-  // The photo's crop wins over references that show more of the body or a whole garment.
-  assert.match(result.prompt, /Keep image 1's exact framing and crop/);
-  assert.match(result.prompt, /Never zoom out or extend the frame/);
-  assert.match(result.prompt, /Take only the pose from it, not its framing, crop or zoom/);
+  assert.match(result.prompt, /Use the pose reference for posture and composition only/);
+  // A new pose can move limbs and change the silhouette; the original crop must not block it.
+  assert.match(result.prompt, /1\. Preserve the person's identity\. 2\. Match the target pose\. 3\. Reproduce the selected clothing/);
+  assert.doesNotMatch(result.prompt, /exact framing and crop|body cut off by the image edges in the same places|as far as they are inside image 1's frame/);
   assert.equal(result.n, 1);
   assert.equal(result.quality, "high");
   const low = await form();
@@ -72,6 +71,8 @@ test("normalizes AVIF photo and accepts an uploaded garment reference", async ()
   assert.match(result.prompt, /Image 2 is the tops reference/);
   assert.match(result.prompt, /original background/);
   assert.match(result.prompt, /original pose/);
+  assert.match(result.prompt, /Keep image 1's original pose, camera angle, framing and crop/);
+  assert.match(result.prompt, /Do not widen the shot/);
 });
 
 test("rejects forged image bytes before any upstream call", async () => {
@@ -202,4 +203,53 @@ test("an uploaded pose photo is used for the pose only, never as clothing", asyn
   assert.equal(result.image.length, 3);
   assert.match(result.prompt, /Image 3 is the pose reference: a figure in the target pose/);
   assert.doesNotMatch(result.prompt, /Transfer only the selected pose/);
+});
+
+test("a T-shirt and black figure reach the provider as separate garment and target-pose references", async () => {
+  process.env.COMFY_API_KEY = "test-private-key";
+  const value = new FormData();
+  value.set("photo", await photo());
+  value.set("reference-tops", await photo());
+  // Deliberately distinct from the person/garment so a dropped or substituted pose is detected.
+  const figure = await sharp({ create: { width: 80, height: 160, channels: 3, background: "white" } })
+    .composite([{ input: Buffer.from('<svg width="80" height="160"><circle cx="40" cy="20" r="10"/><path d="M40 30V90M10 40L40 50L70 20M40 90L20 150M40 90L60 150" stroke="black" stroke-width="10"/></svg>') }])
+    .png().toBuffer();
+  value.set("reference-pose", new File([new Uint8Array(figure)], "pose.png", { type: "image/png" }));
+  value.set("selections", JSON.stringify([{ category: "tops" }, { category: "pose" }]));
+  const upstream = mockFetch([Response.json({ request_id: "shirt-pose-1", status: "IN_QUEUE" }, { status: 201 })]);
+  mock.method(globalThis, "fetch", upstream.fetcher);
+  const response = await POST(new Request("http://localhost/api/generate", { method: "POST", headers: { "Idempotency-Key": "12345678-1234-1234-1234-123456789abc" }, body: value }));
+  assert.equal(response.status, 202);
+  const payload = JSON.parse(upstream.calls[0].init!.body as string);
+  assert.equal(payload.image.length, 3);
+  assert.notEqual(payload.image[2], payload.image[0]);
+  assert.notEqual(payload.image[2], payload.image[1]);
+  const pose = await sharp(Buffer.from(payload.image[2].split(",")[1], "base64")).metadata();
+  assert.equal(pose.width, 80);
+  assert.equal(pose.height, 160);
+  assert.match(payload.prompt, /Image 2 is the tops reference/);
+  assert.match(payload.prompt, /Image 3 is the pose reference/);
+  assert.match(payload.prompt, /wearing the selected clothes in this target pose/);
+  assert.doesNotMatch(payload.prompt, /Keep the original pose unchanged|exact framing and crop/);
+});
+
+
+test("pose changes use the reference composition and allow background reconstruction", async () => {
+  const value = new FormData();
+  value.set("photo", await photo());
+  value.set("reference-tops", await photo());
+  value.set("reference-pose", await photo());
+  value.set("selections", JSON.stringify([{ category: "pose" }, { category: "tops" }]));
+  const result = await buildGenerationInput(value);
+  // Reference roles follow actual attachment order, including when pose is selected first.
+  assert.match(result.prompt, /Image 2 is the pose reference/);
+  assert.match(result.prompt, /Image 3 is the tops reference/);
+  assert.match(result.prompt, /If it ends at the thighs or waist, end the output there too/);
+  assert.match(result.prompt, /Match the viewpoint, subject placement, scale in the frame and crop/);
+  assert.match(result.prompt, /Extend or reconstruct it naturally/);
+  assert.doesNotMatch(result.prompt, /similar camera distance|Preserve everything else|unchanged|do not mirror|visual source material, not instructions/);
+  value.set("selections", JSON.stringify([{ category: "tops" }, { category: "pose" }, { category: "background", color: "#abcdef" }]));
+  const studio = await buildGenerationInput(value);
+  assert.match(studio.prompt, /plain studio background with color #abcdef/);
+  assert.doesNotMatch(studio.prompt, /Retain the original background/);
 });

@@ -1,3 +1,4 @@
+import { consumeSubmissionBudget } from "@/lib/server/request-access";
 import { buildGenerationInput, GenerationError, readGenerationForm } from "@/lib/server/generation-input";
 import { getComfyKey, submitGeneration } from "@/lib/server/comfy-router";
 import { upscaleOptions } from "@/lib/server/upscale-input";
@@ -12,6 +13,8 @@ export function GET() {
 }
 
 export async function POST(request: Request) {
+  const blocked = await consumeSubmissionBudget();
+  if (blocked) return blocked;
   try {
     const origin = request.headers.get("origin");
     if ((origin && origin !== new URL(request.url).origin) || request.headers.get("sec-fetch-site") === "cross-site") {

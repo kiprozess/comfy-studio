@@ -2,7 +2,11 @@
 
 A fashion styling studio built on [Comfy Router](https://docs.comfy.org/development/comfy-router/models). It turns a single photo into new looks, product flat lays and reusable pose references, all generated with **GPT Image 2.5 Sunburst** and upscaled with Comfy's upscalers.
 
-Built with Next.js (App Router), React, TypeScript and Sharp. The UI follows the look of comfy.org/hub.
+Built with Next.js (App Router), React, TypeScript and Sharp. An independent hackathon project using the Comfy Developer Platform; not an official Comfy product.
+
+![Before and after comparison in Comfy Studio](docs/images/before-after.png)
+
+**[Visual walkthrough](docs/USER_GUIDE.md)** · **[MIT license](LICENSE)** · **[Deployment and security notes](SECURITY.md)**
 
 ## What it does
 
@@ -14,9 +18,9 @@ Upload a full-body photo and dress the person in something new:
 - **Outfits:** 16 built-in outfit presets (male and female collections) or your own reference images.
 - **Single garments:** outerwear, tops, sets, bottoms, socks, shoes and accessories, from your own uploads.
 - **Background:** your own background reference images.
-- **Pose:** a mannequin pose reference. The model copies only the body position, never the mannequin's look.
+- **Pose:** a mannequin pose reference. The reference supplies the target posture, camera view, crop and aspect ratio; the person photo supplies identity and the clothing references supply the outfit.
 
-The result keeps the person's identity and the photo's framing. A before/after slider compares it with the original.
+Without a pose reference, the prompt preserves the original photo's pose and framing. With a pose reference, it requests a new composition based on that reference. A before/after slider compares the result with the original. Pose matching and identity preservation are model-guided and are not guaranteed to be exact; different compositions may not line up in the comparison slider.
 
 ### Flatlay
 Upload a photo of a model wearing an outfit and choose what to extract: the complete outfit or any mix of outerwear, tops, bottoms, socks, shoes and accessories. You get a top-down product flat lay of exactly those items on a pure white background, with the person removed.
@@ -32,7 +36,7 @@ Flat lays and poses feed straight back into try-on:
 
 ### Everything else
 - **Quality:** Low, Med, High, XHigh or Max, the quality tiers of GPT Image 2.5 Sunburst (default High).
-- **Output size:** Auto, 2K or 4K. Try-on and pose follow the photo's aspect ratio. Flat lays are always a 2:3 portrait.
+- **Output size:** Auto, 2K or 4K. Try-on follows the person photo's aspect ratio unless a pose is selected, in which case it follows the pose reference. The Pose workflow follows its uploaded photo. Auto size leaves the final dimensions to the model. Flat lays are always a 2:3 portrait.
 - **Upscale:** 2K, 4K or 8K with the Ultimate Image Upscaler. Optionally, a custom SeedVR2 ComfyUI workflow runs on Comfy Cloud.
 - **Last Generations:** the yellow tab on the right opens the history of the last 12 jobs: running and finished jobs with result, date, inputs, settings and request ID. Clicking an image restores it with its photo and all settings. The history is stored in the browser and survives a reload.
 - **Download** and a copyable **request ID** for every result.
@@ -42,7 +46,7 @@ Flat lays and poses feed straight back into try-on:
 Requirements: Node.js 22.17 or newer and a Comfy workspace API key with credits.
 
 1. Create a workspace API key at https://platform.comfy.org.
-2. Copy `.env.example` to `.env.local` and set `COMFY_API_KEY`. The key stays on the server; never prefix it with `NEXT_PUBLIC_` or commit it.
+2. Run `cp .env.example .env.local` and set `COMFY_API_KEY` in `.env.local`. The key stays on the server; never prefix it with `NEXT_PUBLIC_` or commit it.
 3. Install and start:
 
 ```sh
@@ -50,7 +54,13 @@ npm ci
 npm run dev
 ```
 
-The app runs at http://localhost:3000. Without a key, generating stays disabled.
+The app runs at http://127.0.0.1:3000. The development server binds only to the local machine. To use port 3001:
+
+```sh
+npm run dev -- --port 3001
+```
+
+Without a key, generating stays disabled. Each user running their own copy supplies their own Comfy key and credits; the example file contains no credentials.
 
 The dev and production servers run Node with `--use-system-ca`, so the Comfy connection also works behind a locally trusted HTTPS proxy.
 
@@ -60,7 +70,7 @@ The dev and production servers run Node with `--use-system-ca`, so the Comfy con
 npm run lint
 npm test
 npm run build
-npm start
+# See the production configuration below before running npm start.
 ```
 
 ## How it works
@@ -75,9 +85,11 @@ npm start
 | `POST /api/upscale` | Upscales a generated image |
 | `GET /api/generate/[token]` | Status and result of any of the jobs above |
 
-All jobs use Comfy Router's queued delivery: submit, poll the status, collect the result. The integration calls the documented HTTP API directly, without an SDK.
+Try-on, Flatlay, Pose and the default upscaler use Comfy Router's queued delivery: submit, poll the status, collect the result. The optional SeedVR2 upscaler runs a workflow on Comfy Cloud. Both integrations call the HTTP API directly, without an SDK.
 
 ### Security and limits
+- This hackathon prototype has no login or password gate. Anyone who can reach a deployed instance can use its shared generation quota.
+- Production submissions require `APP_RATE_LIMIT_DIR`, an absolute directory on persistent storage outside `public/`. The four paid workflows share defaults of 6 submission attempts per minute and 50 per fixed 24-hour window. Unavailable storage fails closed. See [deployment details](SECURITY.md).
 - The API key never leaves the server. The browser gets a signed job ticket, valid for 24 hours, that only allows status checks for jobs this app started.
 - Uploads are capped at 10 MB and 40 megapixels per file and 32 MB per request. Animated images are rejected.
 - All images, including AVIF, are normalized to JPEG with EXIF data removed. The longest edge is capped at 2048 px.
@@ -105,7 +117,9 @@ The SeedVR2 workflow is exported from ComfyUI in API format:
 - The result is read from node 5 (Save Image).
 
 ### Storage
-Nothing is stored on a server. The browser keeps two IndexedDB stores:
+Photos and results are not persisted by the application server. Images are sent to Comfy and the selected model provider for processing; their service terms and retention policies apply. Production rate-limit counters are stored on disk and contain only window timestamps and counts, not photos or IP addresses.
+
+The browser keeps two IndexedDB stores:
 - `history`: generations with their photos, references and settings.
 - `library`: saved tiles.
 
@@ -149,6 +163,37 @@ A real model run needs a valid key with credits.
 
 The category icons are [Phosphor Icons](https://phosphoricons.com) (MIT). Instead of Comfy's licensed PP Formula, the app uses Inter, which comfy.org also ships.
 
+## Production configuration
+
+Use a Node.js host with Sharp support and a persistent writable volume. Create a private directory on that volume and configure:
+
+```dotenv
+COMFY_API_KEY=your_own_workspace_key
+APP_RATE_LIMIT_DIR=/var/lib/comfy-studio/limits
+APP_REQUESTS_PER_MINUTE=6
+APP_REQUESTS_PER_DAY=50
+```
+
+Then run `npm run build` and `npm start`. Every app replica must use the same persistent directory with atomic filesystem operations; ephemeral/serverless storage is not supported by this limiter. Requests fail with 503 if production limit storage is not configured. Set a Comfy workspace spending limit too: job counts are not a monetary budget. See [SECURITY.md](SECURITY.md) for recovery and deployment constraints.
+
+## Open source and hackathon
+
+The app code is available under the [MIT license](LICENSE). Third-party trademarks, logos, model weights, provider services and example media retain their respective rights; see [asset notes](public/images/README.md). This repository does not include model weights, credentials or free generation credits.
+
+GPT Image is accessed through Comfy Router. Partner APIs are allowed in the general [Open Source Higgsfield competition](https://comfy.org/open-source-higgsfield); this implementation is not an entry for the separate **Open Weights Only** category.
+
+Submission checklist:
+- [x] Local setup instructions and MIT license
+- [x] Screenshot walkthrough
+- [x] Demo video prepared (provided separately by the author)
+- [ ] Publish the YouTube demo/social post with `#OpenSourceHiggsfield` and add its link here
+- [ ] Publish the repository and submit its URL with the demo
+- [ ] Optional: deploy a live demo and add the URL
+
+## Screenshots and local recordings
+
+Selected application screenshots live in [`docs/images`](docs/images) and are explained in the [visual walkthrough](docs/USER_GUIDE.md). Raw screen recordings, voiceovers and working screenshots in `artifacts/` are intentionally ignored by Git and remain on the author's machine. Publish the finished video on YouTube rather than committing the raw recordings.
+
 ## Status
 
-This is a hackathon prototype without user accounts. Before deploying it publicly, the paid generation calls need access control and rate limits. Setting a spending limit on the Comfy workspace is recommended. The host must support Node.js, Sharp and request bodies up to 32 MB.
+Hackathon prototype with working try-on, flatlay, pose and upscale flows. Automated route tests simulate Comfy responses; they do not verify visual model fidelity or provider availability. Real generations require a valid key and credits. The host must accept multipart uploads up to 32 MB and upscale JSON bodies up to 40 MB. Production builds download the Inter font and need network access.
