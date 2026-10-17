@@ -145,7 +145,8 @@ export function StylingProvider({ children }: { children: ReactNode }) {
 
   // Replaces one collection's selection with an earlier generation's; uploaded references return as sidebar tiles.
   const restoreSelections = useCallback((nextGender: Gender, items: { category: CategoryId; choice: StylingChoice }[]) => {
-    const restored = items.map(({ category, choice }) => {
+    // Older history can contain references to the removed bundled outfits.
+    const restored = items.filter(({ choice }) => !("atlasIndex" in choice && choice.atlasIndex !== undefined)).map(({ category, choice }) => {
       if (!choice.file) return { category, choice };
       const imageUrl = URL.createObjectURL(choice.file);
       objectUrls.current.add(imageUrl);

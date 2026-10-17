@@ -288,7 +288,7 @@ export function GenerationProvider({ children }: { children: ReactNode }) {
         for (const category of mode === "tryon" ? stylingCategories : []) {
           const choice = selections[`${gender}:${category.id}`];
           if (!choice) continue;
-          selected.push({ category: category.id, presetIndex: choice.atlasIndex, color: choice.color, pose: choice.pose });
+          selected.push({ category: category.id, color: choice.color, pose: choice.pose });
           if (choice.file) form.append(`reference-${category.id}`, choice.file);
           items.push({ category: category.label, categoryId: category.id, choice: { ...choice, imageUrl: choice.file ? trackUrl(choice.file) : choice.imageUrl } });
         }

@@ -56,18 +56,18 @@ export function parseSelections(value: FormDataEntryValue | null): GenerationSel
       throw new GenerationError("Unknown or duplicate styling category.");
     }
     seen.add(choice.category);
-    const sources = [choice.presetIndex !== undefined, choice.color !== undefined, choice.pose !== undefined].filter(Boolean).length;
-    if (sources > 1) throw new GenerationError("A styling item can only have one reference.");
-    if (choice.presetIndex !== undefined && (choice.category !== "outfit" || !Number.isInteger(choice.presetIndex) || choice.presetIndex < 0 || choice.presetIndex > 15)) {
-      throw new GenerationError("Unknown outfit preset.");
+    if ("presetIndex" in item && item.presetIndex !== undefined) {
+      throw new GenerationError("Built-in outfit presets are no longer available. Upload your own outfit reference.");
     }
+    const sources = [choice.color !== undefined, choice.pose !== undefined].filter(Boolean).length;
+    if (sources > 1) throw new GenerationError("A styling item can only have one reference.");
     if (choice.color !== undefined && (choice.category !== "background" || !/^#[0-9a-f]{6}$/i.test(choice.color))) {
       throw new GenerationError("Invalid background color.");
     }
     if (choice.pose !== undefined && (choice.category !== "pose" || !Number.isInteger(choice.pose) || choice.pose < 0 || choice.pose >= POSES.length)) {
       throw new GenerationError("Unknown pose.");
     }
-    return { category: choice.category, presetIndex: choice.presetIndex, color: choice.color, pose: choice.pose };
+    return { category: choice.category, color: choice.color, pose: choice.pose };
   });
 }
 
@@ -87,14 +87,6 @@ export async function imageData(file: FormDataEntryValue | null) {
 // Pose references are mannequin photos from public/images/poses, sent like any other reference image.
 async function poseImage(index: number) {
   return sharp(path.join(process.cwd(), "public", POSES[index].image)).flatten({ background: "#ffffff" }).jpeg({ quality: 95 }).toBuffer();
-}
-
-async function presetImage(index: number) {
-  const atlas = sharp(path.join(process.cwd(), "public/images/outfit-presets.png"));
-  const metadata = await atlas.metadata();
-  const width = Math.floor(metadata.width! / 4);
-  const height = Math.floor(metadata.height! / 4);
-  return atlas.extract({ left: (index % 4) * width, top: Math.floor(index / 4) * height, width, height }).jpeg({ quality: 95 }).toBuffer();
 }
 
 // A missing field keeps the default, so older clients still work; anything else must be a known tier.
@@ -151,8 +143,7 @@ export async function buildGenerationInput(form: FormData) {
       continue;
     }
     const file = form.get(`reference-${choice.category}`);
-    if (choice.presetIndex !== undefined && file) throw new GenerationError("Choose either an uploaded outfit or a preset.");
-    images.push(choice.presetIndex !== undefined ? await presetImage(choice.presetIndex) : await imageData(file));
+    images.push(await imageData(file));
     instructions.push(`Image ${images.length} is the ${label.toLowerCase()} reference. ${choice.category === "outfit" ? "Transfer its complete outfit onto the person; the reference may be a flat-lay collage. Output the person wearing it, never the collage." : `Transfer only the selected ${label.toLowerCase()} from this reference.`} Match garment colors, patterns, materials and design as closely as possible. Use this image for clothing only, not for the person's identity, pose or background.`);
   }
   if (!selections.some(({ category }) => category === "background")) {

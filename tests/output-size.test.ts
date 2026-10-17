@@ -23,7 +23,8 @@ test("sends the resolved size for try-on and rejects unknown sizes", async () =>
   const form = new FormData();
   const photo = await sharp({ create: { width: 300, height: 400, channels: 3, background: "#806040" } }).png().toBuffer();
   form.set("photo", new File([new Uint8Array(photo)], "p.png", { type: "image/png" }));
-  form.set("selections", JSON.stringify([{ category: "outfit", presetIndex: 0 }]));
+  form.set("reference-outfit", new File([new Uint8Array(await sharp({ create: { width: 80, height: 120, channels: 3, background: "white" } }).png().toBuffer())], "outfit.png", { type: "image/png" }));
+  form.set("selections", JSON.stringify([{ category: "outfit" }]));
   assert.equal((await buildGenerationInput(form)).size, "auto");
   form.set("size", "2k");
   assert.equal((await buildGenerationInput(form)).size, "1536x2048");
@@ -45,7 +46,8 @@ test("a selected pose sets the output aspect ratio instead of the identity photo
     const bytes = await sharp({ create: { width, height, channels: 3, background: "white" } }).png().toBuffer();
     form.set(field, new File([new Uint8Array(bytes)], "image.png", { type: "image/png" }));
   }
-  form.set("selections", JSON.stringify([{ category: "outfit", presetIndex: 0 }, { category: "pose" }]));
+  form.set("reference-outfit", new File([new Uint8Array(await sharp({ create: { width: 80, height: 120, channels: 3, background: "white" } }).png().toBuffer())], "outfit.png", { type: "image/png" }));
+  form.set("selections", JSON.stringify([{ category: "outfit" }, { category: "pose" }]));
   form.set("size", "2k");
   const result = await buildGenerationInput(form);
   assert.equal(result.size, "2048x1536");

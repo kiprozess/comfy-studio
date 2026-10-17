@@ -8,9 +8,9 @@ Follow the [setup instructions](../README.md#getting-started), add your own Comf
 
 ## 2. Select clothing
 
-Choose Male or Female to browse a collection, then expand **Outfit** for built-in presets. Alternatively, upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
+Choose Male or Female to organize your references, then expand **Outfit** and use the **+** tile to upload an outfit image you have permission to use. You can also upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
 
-![Outfit presets in the sidebar](images/outfit-selection.jpg)
+![Upload your own outfit reference](images/outfit-selection.jpg)
 
 Choose output size and quality, then click **Generate**. Each submission uses your Comfy workspace credits. Do not start another job just because the first one is still queued; its status appears in the workspace and history.
 

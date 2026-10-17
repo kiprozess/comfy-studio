@@ -16,9 +16,9 @@ Follow the [setup instructions](#getting-started), add your own Comfy key to `.e
 
 ### 2. Select clothing
 
-Choose Male or Female to browse a collection, then expand **Outfit** for built-in presets. Alternatively, upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
+Choose Male or Female to organize your references, then expand **Outfit** and use the **+** tile to upload an outfit image you have permission to use. You can also upload individual garments under Tops, Bottoms, Shoes and the other categories. Selected tiles appear in **Selected items** below the photo. Click a selected item to inspect it, or remove it with its remove control.
 
-![Outfit presets in the sidebar](docs/images/outfit-selection.jpg)
+![Upload your own outfit reference](docs/images/outfit-selection.jpg)
 
 Choose output size and quality, then click **Generate**. Each submission uses your Comfy workspace credits. Do not start another job just because the first one is still queued; its status appears in the workspace and history.
 
@@ -63,7 +63,7 @@ The switch at the top of the sidebar selects one of three workflows. Each keeps 
 ### Try-on
 Upload a full-body photo and dress the person in something new:
 
-- **Outfits:** 16 built-in outfit presets (male and female collections) or your own reference images.
+- **Outfits:** upload your own outfit reference images (male and female collections).
 - **Single garments:** outerwear, tops, sets, bottoms, socks, shoes and accessories, from your own uploads.
 - **Background:** your own background reference images.
 - **Pose:** a mannequin pose reference. The reference supplies the target posture, camera view, crop and aspect ratio; the person photo supplies identity and the clothing references supply the outfit.
@@ -148,7 +148,7 @@ Each workflow builds its own prompt and numbers its reference images explicitly:
 
 | Workflow | Prompt | Notes |
 |---|---|---|
-| Try-on | `src/lib/server/generation-input.ts` | Outfit presets are cut from the atlas `public/images/outfit-presets.png` on the server |
+| Try-on | `src/lib/server/generation-input.ts` | User-uploaded outfit and garment references are normalized on the server |
 | Flatlay | `src/lib/server/flatlay-input.ts` | Item list in `src/lib/flatlay.ts` |
 | Pose | `src/lib/server/pose-input.ts` | The first library mannequin is sent as the style reference |
 
@@ -189,7 +189,7 @@ Tiles uploaded with “+” last for the current session only.
 
 `npm test` runs the unit and route tests with simulated Comfy responses. They cover:
 - uploads, validation and image normalization
-- preset cropping and the prompts of all three workflows
+- uploaded references and the prompts of all three workflows
 - quality and output sizes
 - queue states, results and errors
 - signed job tickets
@@ -205,7 +205,7 @@ A real model run needs a valid key with credits.
 | `src/components` | UI: sidebar, photo stage, panels, history, buttons |
 | `src/lib` | Shared types and settings: categories, poses, flat lay items, quality, sizes, IndexedDB storage |
 | `src/lib/server` | Request validation, prompts, Comfy Router and Comfy Cloud clients |
-| `public/images` | Comfy logo, outfit preset atlas, pose mannequins |
+| `public/images` | Comfy logo and pose mannequins |
 | `design` | Color tokens taken from comfy.org and the license of the category icons |
 | `tests` | Node test runner suites |
 

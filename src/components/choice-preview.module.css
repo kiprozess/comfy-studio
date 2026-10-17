@@ -1,23 +1,6 @@
-.atlasFrame,
 .colorPreview {
   position: absolute;
   inset: 0;
-}
-
-.atlasFrame {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-}
-
-.atlasImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background-image: url("/images/outfit-presets.png");
-  background-repeat: no-repeat;
-  background-size: 400% 400%;
 }
 
 .uploadedImage {
@@ -26,11 +9,4 @@
 
 .uploadedImage[data-fit="contain"] {
   object-fit: contain;
-}
-
-/* The large preview keeps the tile's 3:4 proportions instead of stretching it. */
-.atlasFrame[data-fit="contain"] .atlasImage {
-  width: auto;
-  max-width: 100%;
-  aspect-ratio: 3 / 4;
 }

@@ -12,22 +12,16 @@ import styles from "./sidebar.module.css";
 import { stylingCategories as categories, type CategoryId } from "@/lib/styling-categories";
 import { POSES } from "@/lib/poses";
 
-const outfitNames = {
-  male: ["Neutral streetwear", "Navy casual", "Tan tailoring", "Black minimal", "Cream knitwear", "Everyday denim", "Olive utility", "Monochrome formal"],
-  female: ["Brown knit & denim", "Cream jacket & skirt", "Little black dress", "Gray tailoring", "Pastel weekend", "Summer whites", "Navy & pleats", "Red knit & trousers"],
-};
 const poses: Choice[] = POSES.map((pose, index) => ({ id: pose.id, label: pose.label, pose: index, imageUrl: pose.image }));
 
 export function Sidebar() {
   const { generate, resume, phase, busy, canGenerate, statusText, mode, setMode } = useGeneration();
   const { gender, setGender, selections, uploads, toggleChoice, addReference, resetStyling, removeFromLibrary } = useStyling();
   const [openCategory, setOpenCategory] = useState<CategoryId | null>(null);
-  const [showMore, setShowMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   function reset() {
     resetStyling();
     setOpenCategory(null);
-    setShowMore(false);
     setError(null);
   }
 
@@ -78,7 +72,7 @@ export function Sidebar() {
             <legend className={styles.srOnly}>Style collection</legend>
             {(["male", "female"] as const).map((value) => (
               <label className={styles.genderOption} key={value}>
-                <input type="radio" name="style-collection" disabled={busy} value={value} checked={gender === value} onChange={() => { setGender(value); setShowMore(false); setError(null); }} />
+                <input type="radio" name="style-collection" disabled={busy} value={value} checked={gender === value} onChange={() => { setGender(value); setError(null); }} />
                 <span>{value === "male" ? "Male" : "Female"}</span>
               </label>
             ))}
@@ -93,11 +87,7 @@ export function Sidebar() {
             const expanded = openCategory === category.id;
             const key = `${gender}:${category.id}`;
             const selected = selections[key];
-            const presetChoices: Choice[] = category.id === "outfit"
-              ? outfitNames[gender].map((label, index) => ({ id: `${gender}-outfit-${index}`, label, atlasIndex: index + (gender === "female" ? 8 : 0) }))
-              : category.id === "pose" ? poses : [];
-            const visiblePresets = category.id === "outfit" && !showMore ? presetChoices.slice(0, 5) : presetChoices;
-            const choices = [...(uploads[key] ?? []), ...visiblePresets];
+            const choices = [...(uploads[key] ?? []), ...(category.id === "pose" ? poses : [])];
 
             return (
               <section className={`${styles.category} ${category.optional ? styles.optionalCategory : ""}`} data-open={expanded} key={category.id}>
@@ -153,14 +143,9 @@ export function Sidebar() {
                             </div>
                           ))}
                         </div>
-                        {choices.length === 0 ? <p className={styles.emptyHint}>Add a {category.label.toLowerCase()} reference.</p> : null}
+                        {choices.length === 0 ? <p className={styles.emptyHint}>Upload your own {category.label.toLowerCase()} reference.</p> : null}
                       </div>
-                      {category.id === "outfit" ? (
-                        <button className={styles.showMore} type="button" onClick={() => setShowMore((value) => !value)} aria-expanded={showMore}>
-                          {showMore ? "Show Less" : "Show More"}
-                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true" style={{ transform: showMore ? "rotate(180deg)" : undefined }}><path d="m4 6 4 4 4-4" /></svg>
-                        </button>
-                      ) : null}
+
                     </div>
                   ) : <div id={`panel-${category.id}`} hidden />}
                 </div>

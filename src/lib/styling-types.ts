@@ -3,7 +3,6 @@ export type Gender = "male" | "female";
 export type StylingChoice = {
   id: string;
   label: string;
-  atlasIndex?: number;
   imageUrl?: string;
   file?: File;
   color?: string;

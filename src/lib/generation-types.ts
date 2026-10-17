@@ -2,7 +2,6 @@ import type { CategoryId } from "./styling-categories";
 
 export type GenerationSelection = {
   category: CategoryId;
-  presetIndex?: number;
   color?: string;
   pose?: number;
 };

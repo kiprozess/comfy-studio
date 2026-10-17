@@ -369,33 +369,6 @@
   font-weight: 700;
 }
 
-.showMore {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 9px 9px 10px;
-  border: 0;
-  border-top: 1px solid var(--app-border);
-  background: none;
-  color: var(--app-text-muted);
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
-
-.showMore:hover {
-  color: var(--app-text);
-}
-
-.showMore svg {
-  width: 13px;
-  height: 13px;
-}
-
 .emptyHint {
   margin: 0;
   padding: 3px 5px 13px;

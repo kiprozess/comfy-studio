@@ -17,7 +17,8 @@ async function photo(type: "png" | "avif" = "png") {
 async function form() {
   const value = new FormData();
   value.set("photo", await photo());
-  value.set("selections", JSON.stringify([{ category: "outfit", presetIndex: 4 }, { category: "background", color: "#d4bfa7" }, { category: "pose", pose: 0 }]));
+  value.set("reference-outfit", await photo());
+  value.set("selections", JSON.stringify([{ category: "outfit" }, { category: "background", color: "#d4bfa7" }, { category: "pose", pose: 0 }]));
   return value;
 }
 
@@ -32,16 +33,15 @@ function mockFetch(responses: Response[]) {
   return { fetcher, calls };
 }
 
-test("builds an edit with the original first, only the selected atlas tile, and optional instructions", async () => {
+test("builds an edit with the original first, the uploaded outfit, and optional instructions", async () => {
   const result = await buildGenerationInput(await form());
   assert.equal(result.image.length, 3);
   const original = await sharp(Buffer.from(result.image[0].split(",")[1], "base64")).metadata();
   const outfit = await sharp(Buffer.from(result.image[1].split(",")[1], "base64")).metadata();
-  const atlas = await sharp("public/images/outfit-presets.png").metadata();
   assert.equal(original.width, 120);
   assert.equal(original.height, 180);
-  assert.equal(outfit.width, Math.floor(atlas.width! / 4));
-  assert.equal(outfit.height, Math.floor(atlas.height! / 4));
+  assert.equal(outfit.width, 120);
+  assert.equal(outfit.height, 180);
   assert.match(result.prompt, /Image 2 is the outfit reference/);
   assert.match(result.prompt, /#d4bfa7/);
   // The pose travels as a mannequin reference image after the clothing references.
@@ -94,6 +94,7 @@ test("rejects duplicate categories, traversal presets and mismatched reference t
     [{ category: "outfit", presetIndex: "../../secret" }],
     [{ category: "tops", presetIndex: 1 }],
     [{ category: "outfit", presetIndex: 16 }],
+    [{ category: "outfit", presetIndex: 0 }],
     [{ category: "background", color: "ignore instructions" }],
     [{ category: "pose", pose: 1 }],
     [{ category: "pose", pose: 0 }, { category: "pose", pose: 1 }],
@@ -198,7 +199,8 @@ test("an uploaded pose photo is used for the pose only, never as clothing", asyn
   const value = new FormData();
   value.set("photo", await photo());
   value.set("reference-pose", await photo());
-  value.set("selections", JSON.stringify([{ category: "outfit", presetIndex: 0 }, { category: "pose" }]));
+  value.set("reference-outfit", await photo());
+  value.set("selections", JSON.stringify([{ category: "outfit" }, { category: "pose" }]));
   const result = await buildGenerationInput(value);
   assert.equal(result.image.length, 3);
   assert.match(result.prompt, /Image 3 is the pose reference: a figure in the target pose/);

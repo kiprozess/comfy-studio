@@ -9,13 +9,6 @@ export function ChoicePreview({ choice, fit = "cover" }: { choice: StylingChoice
   if (choice.imageUrl) {
     return <Image src={choice.imageUrl} alt="" fill sizes={fit === "contain" ? "520px" : "88px"} unoptimized className={styles.uploadedImage} data-fit={fit} />;
   }
-  if (choice.atlasIndex !== undefined) {
-    return (
-      <span className={styles.atlasFrame} data-fit={fit} aria-hidden="true">
-        <span className={styles.atlasImage} style={{ backgroundPosition: `${(choice.atlasIndex % 4) * 100 / 3}% ${Math.floor(choice.atlasIndex / 4) * 100 / 3}%` }} />
-      </span>
-    );
-  }
   if (choice.color) {
     return <span className={styles.colorPreview} style={{ background: choice.color }} aria-hidden="true" />;
   }
