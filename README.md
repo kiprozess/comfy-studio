@@ -224,6 +224,8 @@ APP_REQUESTS_PER_MINUTE=6
 APP_REQUESTS_PER_DAY=50
 ```
 
+On Railway, attach a volume at `/data` and use `APP_RATE_LIMIT_DIR=/data/rate-limits`. The public HTTPS origin is detected from Railway's `RAILWAY_PUBLIC_DOMAIN`. For a custom domain or another reverse proxy, set `APP_ORIGIN=https://your-app.example.com` so browser requests are checked against the public URL rather than the internal container address.
+
 Then run `npm run build` and `npm start`. Every app replica must use the same persistent directory with atomic filesystem operations; ephemeral/serverless storage is not supported by this limiter. Requests fail with 503 if production limit storage is not configured. Set a Comfy workspace spending limit too: job counts are not a monetary budget. See [SECURITY.md](SECURITY.md) for recovery and deployment constraints.
 
 ## License

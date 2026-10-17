@@ -1,3 +1,4 @@
+import { isAppRequest } from "@/lib/server/request-origin";
 import { consumeSubmissionBudget } from "@/lib/server/request-access";
 import { GenerationError } from "@/lib/server/generation-input";
 import { parseUpscaleRequest, upscaleOptions } from "@/lib/server/upscale-input";
@@ -10,13 +11,12 @@ const headers = { "Cache-Control": "no-store" };
 
 // Status and result are read through /api/generate/[token]; the ticket names the model that runs the job.
 export async function POST(request: Request) {
-  const blocked = await consumeSubmissionBudget();
-  if (blocked) return blocked;
   try {
-    const origin = request.headers.get("origin");
-    if ((origin && origin !== new URL(request.url).origin) || request.headers.get("sec-fetch-site") === "cross-site") {
+    if (!isAppRequest(request)) {
       throw new GenerationError("Please start upscaling from this app.", 403);
     }
+    const blocked = await consumeSubmissionBudget();
+    if (blocked) return blocked;
     const key = getComfyKey();
     const idempotencyKey = request.headers.get("idempotency-key");
     if (!idempotencyKey || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new GenerationError("Missing upscale request ID.");

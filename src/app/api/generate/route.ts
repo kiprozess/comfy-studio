@@ -1,3 +1,4 @@
+import { isAppRequest } from "@/lib/server/request-origin";
 import { consumeSubmissionBudget } from "@/lib/server/request-access";
 import { buildGenerationInput, GenerationError, readGenerationForm } from "@/lib/server/generation-input";
 import { getComfyKey, submitGeneration } from "@/lib/server/comfy-router";
@@ -13,13 +14,12 @@ export function GET() {
 }
 
 export async function POST(request: Request) {
-  const blocked = await consumeSubmissionBudget();
-  if (blocked) return blocked;
   try {
-    const origin = request.headers.get("origin");
-    if ((origin && origin !== new URL(request.url).origin) || request.headers.get("sec-fetch-site") === "cross-site") {
+    if (!isAppRequest(request)) {
       throw new GenerationError("Please start generation from this app.", 403);
     }
+    const blocked = await consumeSubmissionBudget();
+    if (blocked) return blocked;
     const key = getComfyKey();
     const idempotencyKey = request.headers.get("idempotency-key");
     if (!idempotencyKey || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new GenerationError("Missing generation request ID.");
