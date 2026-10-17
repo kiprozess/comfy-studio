@@ -54,7 +54,7 @@ The slider compares two images in the same display area. When the pose changes c
 
 ### Where your images go
 
-The application sends images to Comfy and the selected model provider to generate results. History and saved library tiles stay in this browser's IndexedDB. Clearing browser storage removes them. Raw recordings and working media under `artifacts/` are excluded from the repository; these selected screenshots are the documentation copies.
+The application sends images to Comfy and the selected model provider to generate results. History and saved library tiles stay in this browser's IndexedDB. Clearing browser storage removes them. 
 
 ## What it does
 
@@ -213,6 +213,8 @@ The category icons are [Phosphor Icons](https://phosphoricons.com) (MIT). Instea
 
 ## Production configuration
 
+The host must accept multipart uploads up to 32 MB and upscale JSON bodies up to 40 MB. Production builds download the Inter font and need network access.
+
 Use a Node.js host with Sharp support and a persistent writable volume. Create a private directory on that volume and configure:
 
 ```dotenv
@@ -224,24 +226,6 @@ APP_REQUESTS_PER_DAY=50
 
 Then run `npm run build` and `npm start`. Every app replica must use the same persistent directory with atomic filesystem operations; ephemeral/serverless storage is not supported by this limiter. Requests fail with 503 if production limit storage is not configured. Set a Comfy workspace spending limit too: job counts are not a monetary budget. See [SECURITY.md](SECURITY.md) for recovery and deployment constraints.
 
-## Open source and hackathon
+## License
 
-The app code is available under the [MIT license](LICENSE). Third-party trademarks, logos, model weights, provider services and example media retain their respective rights; see [asset notes](public/images/README.md). This repository does not include model weights, credentials or free generation credits.
-
-GPT Image is accessed through Comfy Router. Partner APIs are allowed in the general [Open Source Higgsfield competition](https://comfy.org/open-source-higgsfield); this implementation is not an entry for the separate **Open Weights Only** category.
-
-Submission checklist:
-- [x] Local setup instructions and MIT license
-- [x] Screenshot walkthrough
-- [x] Demo video prepared (provided separately by the author)
-- [ ] Publish the YouTube demo/social post with `#OpenSourceHiggsfield` and add its link here
-- [ ] Publish the repository and submit its URL with the demo
-- [ ] Optional: deploy a live demo and add the URL
-
-## Screenshots and local recordings
-
-Selected application screenshots live in [`docs/images`](docs/images) and are explained in the [visual walkthrough](docs/USER_GUIDE.md). Raw screen recordings, voiceovers and working screenshots in `artifacts/` are intentionally ignored by Git and remain on the author's machine. Publish the finished video on YouTube rather than committing the raw recordings.
-
-## Status
-
-Hackathon prototype with working try-on, flatlay, pose and upscale flows. Automated route tests simulate Comfy responses; they do not verify visual model fidelity or provider availability. Real generations require a valid key and credits. The host must accept multipart uploads up to 32 MB and upscale JSON bodies up to 40 MB. Production builds download the Inter font and need network access.
+Code is licensed under [MIT](LICENSE). Third-party assets and trademarks retain their respective rights; see [asset notes](public/images/README.md).
